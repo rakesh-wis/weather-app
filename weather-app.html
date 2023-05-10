@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather App</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="p-5 text-center">
+        <h1 class="mb-4">Weather area temparecher</h1>
+        <form action="" id="myForm">
+          <div class="search-box d-flex align-items-center justify-content-between">
+            <input type="text" id="inputValue" class="form-control me-3" placeholder="search Weather data" />
+            <button class="btn btn-primary fs-5 fw-bold" type="submit">submit</button>
+          </div>
+        </form>
+        <div class="show-result mt-5">
+          <div>
+            <div id="icon">
+            <img src="http://openweathermap.org/img/wn/01d.png" alt=""/>
+          </div>
+            <h1 class="temparecher">30°C</h1>
+            <p class="description">Test</p>
+          </div>
+          <ul class="list-inline mt-5 tem-details">
+            <li class="list-inline-item">
+              <p>Min temparecher</p>
+              <h6>24°C</h6>
+            </li>
+            <li class="list-inline-item">
+              <p>Max temparecher</p>
+              <h6>44°C</h6>
+            </li>
+            <li class="list-inline-item">
+              <p>Feels Like</p>
+              <h6>23°</h6>
+            </li>
+            
+            <li class="list-inline-item">
+              <p>Humidity</p>
+              <h6>41%</h6>
+            </li>
+            <li class="list-inline-item">
+              <p>Pressure</p>
+              <h6>1001 mb</h6>
+            </li>
+            <li class="list-inline-item">
+              <p>Wind Speed</p>
+              <h6>3 km/h</h6>
+            </li>
+            <li class="list-inline-item">
+              <p>Visibility</p>
+              <h6>4 km</h6>
+            </li>
+            
+            
+          </ul>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      const apiKey = '6d013d685b4a6822ba72b0d0aa3d8911';
+
+      const inputVal = document.getElementById('inputValue');
+      const myForm = document.getElementById('myForm');
+      const showResult = document.getElementsByClassName('show-result');
+
+
+      myForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        console.log(inputVal.value);
+        const cityValue = inputVal.value;
+        getWeatherData(cityValue)
+      });
+      async function getWeatherData(cityValue) {
+        
+        try {
+          const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityValue}&appid=${apiKey}`);
+          if (!res.ok) {
+            throw new Error('network response was not ok')
+          }
+          const data = await res.json();
+          const temparecher = Math.round(data.main.temp -273.15);
+          document.getElementsByClassName('temparecher')[0].innerText = temparecher + '°C';
+          document.getElementsByClassName('description')[0].innerText = data.weather[0].description;
+          document.getElementById('icon').innerHTML=`<img src="http://openweathermap.org/img/wn/${data.weather[0].icon}.png" alt="tttt"/>`;
+          const details = [
+            { name:'Min temparecher', value: Math.round(data.main.temp_min - 273.15) + '°C'},
+            { name: 'Max temparecher', value: Math.round(data.main.temp_max - 273.15) + '°C'},
+            { name: 'Feels Like', value: Math.round(data.main.feels_like -273.15) + '°C'},
+            { name: 'Humidity', value: data.main.humidity + '%'},
+            { name: 'Pressure', value: data.main.pressure + 'mb'},
+            { name: 'Wind Speed', value: (data.wind.speed * 3.6).toFixed(0) + ' km/h'},
+            { name: 'Visibility', value: (data.visibility / 1000).toFixed(0) + 'km'},
+            { name: 'Country', value: data.sys.country},
+          ]
+          document.querySelector('.tem-details').innerHTML=details.map( (item) =>
+          ` <li class="list-inline-item"><p>${item.name}</p><h6>${item.value}</h6></li>`,
+          ).join("")
+          // console.log('temparecher',details)
+        } catch (error) {
+          
+        }
+      }
+    </script>
+  </body>
+</html>
